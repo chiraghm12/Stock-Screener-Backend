@@ -21,6 +21,7 @@ class StockAdmin(admin.ModelAdmin):
         "nifty_100",
         "nifty_200",
         "nifty_500",
+        "chart_link",
     )
     search_fields = ("symbol", "name", "isin_code")
     list_filter = ("nifty_50", "nifty_next_50", "nifty_100", "nifty_200", "nifty_500")

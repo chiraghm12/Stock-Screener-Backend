@@ -21,13 +21,6 @@ class Stock(BaseModel):
     nifty_200 = models.BooleanField(default=False)
     nifty_500 = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
-        """Override save method to ensure symbol is uppercase."""
-        self.chart_link = (
-            f"https://www.tradingview.com/chart/?symbol=NSE:{self.symbol.upper()}/"
-        )
-        super().save(*args, **kwargs)
-
     def __str__(self):
         """Return a string representation of the stock."""
         return f"{self.symbol} - {self.name}"

@@ -20,6 +20,8 @@ from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
+from screener.urls import urlpatterns as screener_urls
+
 # Configure the OpenAPI schema view for API documentation
 schema_view = get_schema_view(
     openapi.Info(
@@ -40,3 +42,5 @@ urlpatterns = [
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
 ]
+
+urlpatterns.extend(screener_urls)
