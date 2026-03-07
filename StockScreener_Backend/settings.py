@@ -10,10 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import logging
+import logging.config
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+from StockScreener_Backend.logging import LOGGING
 
 load_dotenv()
 
@@ -42,6 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "drf_yasg",
     "screener",
 ]
@@ -49,11 +54,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "StockScreener_Backend.middlewares.RequestLoggingMiddleware",
 ]
 
 ROOT_URLCONF = "StockScreener_Backend.urls"
@@ -122,7 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Kolkata"
 
 USE_I18N = True
 
@@ -133,3 +140,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+# Logging Settings
+LOGGING_DIR = os.path.join(BASE_DIR, "money_tracker_logs")
+os.makedirs(LOGGING_DIR, exist_ok=True)
+LOGGING_CONFIG = None
+logging.config.dictConfig(LOGGING)

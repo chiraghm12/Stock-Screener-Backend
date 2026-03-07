@@ -12,6 +12,7 @@ class StockAdmin(admin.ModelAdmin):
     """
 
     list_display = (
+        "id",
         "symbol",
         "name",
         "isin_code",
