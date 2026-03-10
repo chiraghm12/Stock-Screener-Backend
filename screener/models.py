@@ -68,3 +68,23 @@ class StockPrice(BaseModel):
         unique_together = ["stock", "date"]
         verbose_name = "Stock Price"
         verbose_name_plural = "Stock Prices"
+
+
+class HammerPattern(BaseModel):
+    """Model representing a hammer pattern."""
+
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="hammer_patterns"
+    )
+    date = models.DateField()
+    stock_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class InvertedHammerPattern(BaseModel):
+    """Model representing an inverted hammer pattern."""
+
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="inverted_hammer_patterns"
+    )
+    date = models.DateField()
+    stock_price = models.DecimalField(max_digits=10, decimal_places=2)

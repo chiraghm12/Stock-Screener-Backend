@@ -1,5 +1,7 @@
 asgiref==3.11.1
+certifi==2026.2.25
 cfgv==3.5.0
+charset-normalizer==3.4.5
 concurrent-log-handler==0.9.29
 coverage==7.13.4
 distlib==0.4.0
@@ -10,6 +12,7 @@ djangorestframework_simplejwt==5.5.1
 drf-yasg==1.21.15
 filelock==3.25.0
 identify==2.6.17
+idna==3.11
 inflection==0.5.1
 nodeenv==1.10.0
 packaging==26.0
@@ -23,7 +26,9 @@ python-dotenv==1.2.2
 pytz==2026.1.post1
 pywin32==311
 PyYAML==6.0.3
+requests==2.32.5
 sqlparse==0.5.5
 tzdata==2025.3
 uritemplate==4.2.0
+urllib3==2.6.3
 virtualenv==21.1.0

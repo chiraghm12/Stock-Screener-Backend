@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Stock, StockPrice
+from .models import HammerPattern, InvertedHammerPattern, Stock, StockPrice
 
 
 @admin.register(Stock)
@@ -52,5 +52,23 @@ class StockPriceAdmin(admin.ModelAdmin):
         "delivery_quantity",
         "delivery_percentage",
     )
+    search_fields = ("stock__symbol", "stock__name")
+    list_filter = ("date",)
+
+
+@admin.register(HammerPattern)
+class HammerPatternAdmin(admin.ModelAdmin):
+    """Admin interface for managing HammerPattern instances."""
+
+    list_display = ("id", "stock", "date", "stock_price")
+    search_fields = ("stock__symbol", "stock__name")
+    list_filter = ("date",)
+
+
+@admin.register(InvertedHammerPattern)
+class InvertedHammerPatternAdmin(admin.ModelAdmin):
+    """Admin interface for managing InvertedHammerPattern instances."""
+
+    list_display = ("id", "stock", "date", "stock_price")
     search_fields = ("stock__symbol", "stock__name")
     list_filter = ("date",)
