@@ -105,7 +105,7 @@ def fetch_and_store_nse_stock_price_data(days: int = 45) -> int:
                 len(data["data"]),
             )
             # Small delay to reduce chance of NSE blocking
-            time.sleep(0.5)
+            time.sleep(0.2)
 
         created_count = 0
         if price_objects:
