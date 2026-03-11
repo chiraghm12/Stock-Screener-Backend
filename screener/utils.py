@@ -177,8 +177,8 @@ def add_pattern_data() -> Dict[str, Any]:
         inverted_hammer_objects = []
 
         # Clean existing patterns for that date to avoid duplicates
-        HammerPattern.objects.filter(date=latest_date).delete()
-        InvertedHammerPattern.objects.filter(date=latest_date).delete()
+        HammerPattern.objects.all().delete()
+        InvertedHammerPattern.objects.all().delete()
 
         for price in prices:
             open_price = Decimal(price.opening_price)

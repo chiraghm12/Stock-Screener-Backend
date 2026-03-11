@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_yasg",
     "screener",
+    "django_filters",
 ]
 
 MIDDLEWARE = [

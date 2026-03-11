@@ -31,6 +31,15 @@ class Stock(BaseModel):
         db_table = "stock"
         verbose_name = "Stock"
         verbose_name_plural = "Stocks"
+        indexes = [
+            models.Index(fields=["symbol"]),
+            models.Index(fields=["isin_code"]),
+            models.Index(fields=["nifty_50"]),
+            models.Index(fields=["nifty_next_50"]),
+            models.Index(fields=["nifty_100"]),
+            models.Index(fields=["nifty_200"]),
+            models.Index(fields=["nifty_500"]),
+        ]
 
 
 class StockPrice(BaseModel):
@@ -68,6 +77,10 @@ class StockPrice(BaseModel):
         unique_together = ["stock", "date"]
         verbose_name = "Stock Price"
         verbose_name_plural = "Stock Prices"
+        indexes = [
+            models.Index(fields=["stock", "date"]),
+            models.Index(fields=["date"]),
+        ]
 
 
 class HammerPattern(BaseModel):
@@ -79,6 +92,12 @@ class HammerPattern(BaseModel):
     date = models.DateField()
     stock_price = models.DecimalField(max_digits=10, decimal_places=2)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["stock", "date"]),
+        ]
+
 
 class InvertedHammerPattern(BaseModel):
     """Model representing an inverted hammer pattern."""
@@ -88,3 +107,9 @@ class InvertedHammerPattern(BaseModel):
     )
     date = models.DateField()
     stock_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["stock", "date"]),
+        ]
