@@ -15,6 +15,7 @@ import logging.config
 import os
 from pathlib import Path
 
+from corsheaders.defaults import default_headers
 from dotenv import load_dotenv
 
 from StockScreener_Backend.logging import LOGGING
@@ -35,6 +36,17 @@ SECRET_KEY = "django-insecure-ht_d+@b525)*+t5s306ru8@d9a-e!=-mzupl-=qs8ao!q4#jg@
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "content-type",
+]
 
 
 # Application definition
