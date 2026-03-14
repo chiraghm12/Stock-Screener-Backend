@@ -5,6 +5,7 @@ from .views import (
     BearishKickerPatternListView,
     BullishEngulfingPatternListView,
     BullishKickerPatternListView,
+    DeliveryDataView,
     DojiPatternListView,
     HammerPatternListView,
     InvertedHammerPatternListView,
@@ -63,5 +64,10 @@ urlpatterns = [
         "patterns/pro-gap-negative/",
         ProGapNegativePatternListView.as_view(),
         name="pro-gap-negative-pattern-list",
+    ),
+    path(
+        "delivery-data/",
+        DeliveryDataView.as_view(),
+        name="delivery-data-list",
     ),
 ]
