@@ -1,6 +1,13 @@
 from rest_framework import serializers
 
-from .models import HammerPattern, InvertedHammerPattern, Stock, StockPrice
+from .models import (
+    BearishEngulfingPattern,
+    BullishEngulfingPattern,
+    HammerPattern,
+    InvertedHammerPattern,
+    Stock,
+    StockPrice,
+)
 
 
 class StockSerializer(serializers.ModelSerializer):
@@ -103,6 +110,52 @@ class InvertedHammerPatternSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvertedHammerPattern
+        fields = [
+            "id",
+            "stock",
+            "date",
+            "stock_price",
+            "stock_price_details",
+        ]
+
+    def get_stock_price_details(self, obj):
+        price = StockPrice.objects.filter(stock=obj.stock, date=obj.date).first()
+        if not price:
+            return None
+        return StockPriceSerializer(price).data
+
+
+class BullishEngulfingPatternSerializer(serializers.ModelSerializer):
+    """Serializer for bullish engulfing pattern data."""
+
+    stock = StockSerializer(read_only=True)
+    stock_price_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BullishEngulfingPattern
+        fields = [
+            "id",
+            "stock",
+            "date",
+            "stock_price",
+            "stock_price_details",
+        ]
+
+    def get_stock_price_details(self, obj):
+        price = StockPrice.objects.filter(stock=obj.stock, date=obj.date).first()
+        if not price:
+            return None
+        return StockPriceSerializer(price).data
+
+
+class BearishEngulfingPatternSerializer(serializers.ModelSerializer):
+    """Serializer for bearish engulfing pattern data."""
+
+    stock = StockSerializer(read_only=True)
+    stock_price_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BearishEngulfingPattern
         fields = [
             "id",
             "stock",

@@ -5,9 +5,15 @@ from typing import Any, Dict
 
 import requests
 from django.db import transaction
-from django.db.models import Max
 
-from .models import HammerPattern, InvertedHammerPattern, Stock, StockPrice
+from .models import (
+    BearishEngulfingPattern,
+    BullishEngulfingPattern,
+    HammerPattern,
+    InvertedHammerPattern,
+    Stock,
+    StockPrice,
+)
 
 logger = logging.getLogger("stock_screener_logger")
 
@@ -156,16 +162,25 @@ def add_pattern_data() -> Dict[str, Any]:
             - "inverted_hammer_count": number of inverted hammer patterns created
     """
     try:
-        latest_date_data = StockPrice.objects.aggregate(latest_date=Max("date"))
-        latest_date = latest_date_data.get("latest_date")
+        dates = (
+            StockPrice.objects.values_list("date", flat=True)
+            .distinct()
+            .order_by("-date")[:2]
+        )
+        date_list = list(dates)
 
-        if latest_date is None:
+        if not date_list:
             logger.info("No stock price data available for pattern detection")
             return {
                 "date": None,
                 "hammer_count": 0,
                 "inverted_hammer_count": 0,
+                "bullish_engulfing_count": 0,
+                "bearish_engulfing_count": 0,
             }
+
+        latest_date = date_list[0]
+        prev_date = date_list[1] if len(date_list) > 1 else None
 
         prices = (
             StockPrice.objects.filter(date=latest_date)
@@ -173,12 +188,22 @@ def add_pattern_data() -> Dict[str, Any]:
             .order_by("stock__symbol")
         )
 
+        prev_prices_dict = {}
+        if prev_date:
+            prev_prices = StockPrice.objects.filter(date=prev_date)
+            for p in prev_prices:
+                prev_prices_dict[p.stock_id] = p
+
         hammer_objects = []
         inverted_hammer_objects = []
+        bullish_engulfing_objects = []
+        bearish_engulfing_objects = []
 
         # Clean existing patterns for that date to avoid duplicates
         HammerPattern.objects.all().delete()
         InvertedHammerPattern.objects.all().delete()
+        BullishEngulfingPattern.objects.all().delete()
+        BearishEngulfingPattern.objects.all().delete()
 
         for price in prices:
             open_price = Decimal(price.opening_price)
@@ -219,8 +244,42 @@ def add_pattern_data() -> Dict[str, Any]:
                     )
                 )
 
+            # Engulfing patterns
+            prev_price = prev_prices_dict.get(price.stock_id)
+            if prev_price:
+                prev_open = Decimal(prev_price.opening_price)
+                prev_close = Decimal(prev_price.closing_price)
+
+                is_prev_bearish = prev_close < prev_open
+                is_curr_bullish = close_price > open_price
+                engulfs_bullish = open_price <= prev_close and close_price >= prev_open
+
+                if is_prev_bearish and is_curr_bullish and engulfs_bullish:
+                    bullish_engulfing_objects.append(
+                        BullishEngulfingPattern(
+                            stock=price.stock,
+                            date=latest_date,
+                            stock_price=price.closing_price,
+                        )
+                    )
+
+                is_prev_bullish = prev_close > prev_open
+                is_curr_bearish = close_price < open_price
+                engulfs_bearish = open_price >= prev_close and close_price <= prev_open
+
+                if is_prev_bullish and is_curr_bearish and engulfs_bearish:
+                    bearish_engulfing_objects.append(
+                        BearishEngulfingPattern(
+                            stock=price.stock,
+                            date=latest_date,
+                            stock_price=price.closing_price,
+                        )
+                    )
+
         hammer_count = 0
         inverted_hammer_count = 0
+        bullish_engulfing_count = 0
+        bearish_engulfing_count = 0
 
         if hammer_objects:
             HammerPattern.objects.bulk_create(hammer_objects, batch_size=500)
@@ -233,25 +292,45 @@ def add_pattern_data() -> Dict[str, Any]:
             )
             inverted_hammer_count = len(inverted_hammer_objects)
 
+        if bullish_engulfing_objects:
+            BullishEngulfingPattern.objects.bulk_create(
+                bullish_engulfing_objects,
+                batch_size=500,
+            )
+            bullish_engulfing_count = len(bullish_engulfing_objects)
+
+        if bearish_engulfing_objects:
+            BearishEngulfingPattern.objects.bulk_create(
+                bearish_engulfing_objects,
+                batch_size=500,
+            )
+            bearish_engulfing_count = len(bearish_engulfing_objects)
+
         logger.info(
-            "Pattern detection for %s completed: %s hammer, %s inverted hammer",
+            "Pattern detection for %s completed: %s hammer, %s inverted hammer, %s bullish engulfing, %s bearish engulfing",
             latest_date,
             hammer_count,
             inverted_hammer_count,
+            bullish_engulfing_count,
+            bearish_engulfing_count,
         )
 
         return {
             "date": latest_date,
             "hammer_count": hammer_count,
             "inverted_hammer_count": inverted_hammer_count,
+            "bullish_engulfing_count": bullish_engulfing_count,
+            "bearish_engulfing_count": bearish_engulfing_count,
         }
     except Exception as e:
         logger.exception(
-            "Unexpected error while detecting hammer patterns: %s",
+            "Unexpected error while detecting candlestick patterns: %s",
             e,
         )
         return {
             "date": None,
             "hammer_count": 0,
             "inverted_hammer_count": 0,
+            "bullish_engulfing_count": 0,
+            "bearish_engulfing_count": 0,
         }

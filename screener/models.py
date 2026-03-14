@@ -113,3 +113,35 @@ class InvertedHammerPattern(BaseModel):
             models.Index(fields=["date"]),
             models.Index(fields=["stock", "date"]),
         ]
+
+
+class BullishEngulfingPattern(BaseModel):
+    """Model representing a bullish engulfing pattern."""
+
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="bullish_engulfing_patterns"
+    )
+    date = models.DateField()
+    stock_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["stock", "date"]),
+        ]
+
+
+class BearishEngulfingPattern(BaseModel):
+    """Model representing a bearish engulfing pattern."""
+
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="bearish_engulfing_patterns"
+    )
+    date = models.DateField()
+    stock_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["stock", "date"]),
+        ]

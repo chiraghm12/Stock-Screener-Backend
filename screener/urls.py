@@ -1,6 +1,8 @@
 from django.urls import path
 
 from .views import (
+    BearishEngulfingPatternListView,
+    BullishEngulfingPatternListView,
     HammerPatternListView,
     InvertedHammerPatternListView,
     StockPriceCreateView,
@@ -21,5 +23,15 @@ urlpatterns = [
         "patterns/inverted-hammer/",
         InvertedHammerPatternListView.as_view(),
         name="inverted-hammer-pattern-list",
+    ),
+    path(
+        "patterns/bullish-engulfing/",
+        BullishEngulfingPatternListView.as_view(),
+        name="bullish-engulfing-pattern-list",
+    ),
+    path(
+        "patterns/bearish-engulfing/",
+        BearishEngulfingPatternListView.as_view(),
+        name="bearish-engulfing-pattern-list",
     ),
 ]

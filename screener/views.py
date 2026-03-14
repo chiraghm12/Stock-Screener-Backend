@@ -4,9 +4,24 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .filters import HammerPatternFilter, InvertedHammerPatternFilter
-from .models import HammerPattern, InvertedHammerPattern
-from .serializers import HammerPatternSerializer, InvertedHammerPatternSerializer
+from .filters import (
+    BearishEngulfingPatternFilter,
+    BullishEngulfingPatternFilter,
+    HammerPatternFilter,
+    InvertedHammerPatternFilter,
+)
+from .models import (
+    BearishEngulfingPattern,
+    BullishEngulfingPattern,
+    HammerPattern,
+    InvertedHammerPattern,
+)
+from .serializers import (
+    BearishEngulfingPatternSerializer,
+    BullishEngulfingPatternSerializer,
+    HammerPatternSerializer,
+    InvertedHammerPatternSerializer,
+)
 from .utils import add_pattern_data, fetch_and_store_nse_stock_price_data
 
 logger = logging.getLogger("stock_screener_logger")
@@ -59,3 +74,19 @@ class InvertedHammerPatternListView(generics.ListAPIView):
     queryset = InvertedHammerPattern.objects.all().select_related("stock")
     serializer_class = InvertedHammerPatternSerializer
     filterset_class = InvertedHammerPatternFilter
+
+
+class BullishEngulfingPatternListView(generics.ListAPIView):
+    """List API view for bullish engulfing patterns with optional index/date filtering."""
+
+    queryset = BullishEngulfingPattern.objects.all().select_related("stock")
+    serializer_class = BullishEngulfingPatternSerializer
+    filterset_class = BullishEngulfingPatternFilter
+
+
+class BearishEngulfingPatternListView(generics.ListAPIView):
+    """List API view for bearish engulfing patterns with optional index/date filtering."""
+
+    queryset = BearishEngulfingPattern.objects.all().select_related("stock")
+    serializer_class = BearishEngulfingPatternSerializer
+    filterset_class = BearishEngulfingPatternFilter
