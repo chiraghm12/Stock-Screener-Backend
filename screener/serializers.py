@@ -2,9 +2,14 @@ from rest_framework import serializers
 
 from .models import (
     BearishEngulfingPattern,
+    BearishKickerPattern,
     BullishEngulfingPattern,
+    BullishKickerPattern,
+    DojiPattern,
     HammerPattern,
     InvertedHammerPattern,
+    ProGapNegativePattern,
+    ProGapPositivePattern,
     Stock,
     StockPrice,
 )
@@ -156,6 +161,121 @@ class BearishEngulfingPatternSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BearishEngulfingPattern
+        fields = [
+            "id",
+            "stock",
+            "date",
+            "stock_price",
+            "stock_price_details",
+        ]
+
+    def get_stock_price_details(self, obj):
+        price = StockPrice.objects.filter(stock=obj.stock, date=obj.date).first()
+        if not price:
+            return None
+        return StockPriceSerializer(price).data
+
+
+class DojiPatternSerializer(serializers.ModelSerializer):
+    """Serializer for doji pattern data."""
+
+    stock = StockSerializer(read_only=True)
+    stock_price_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DojiPattern
+        fields = [
+            "id",
+            "stock",
+            "date",
+            "stock_price",
+            "stock_price_details",
+        ]
+
+    def get_stock_price_details(self, obj):
+        price = StockPrice.objects.filter(stock=obj.stock, date=obj.date).first()
+        if not price:
+            return None
+        return StockPriceSerializer(price).data
+
+
+class BullishKickerPatternSerializer(serializers.ModelSerializer):
+    """Serializer for bullish kicker pattern data."""
+
+    stock = StockSerializer(read_only=True)
+    stock_price_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BullishKickerPattern
+        fields = [
+            "id",
+            "stock",
+            "date",
+            "stock_price",
+            "stock_price_details",
+        ]
+
+    def get_stock_price_details(self, obj):
+        price = StockPrice.objects.filter(stock=obj.stock, date=obj.date).first()
+        if not price:
+            return None
+        return StockPriceSerializer(price).data
+
+
+class BearishKickerPatternSerializer(serializers.ModelSerializer):
+    """Serializer for bearish kicker pattern data."""
+
+    stock = StockSerializer(read_only=True)
+    stock_price_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BearishKickerPattern
+        fields = [
+            "id",
+            "stock",
+            "date",
+            "stock_price",
+            "stock_price_details",
+        ]
+
+    def get_stock_price_details(self, obj):
+        price = StockPrice.objects.filter(stock=obj.stock, date=obj.date).first()
+        if not price:
+            return None
+        return StockPriceSerializer(price).data
+
+
+class ProGapPositivePatternSerializer(serializers.ModelSerializer):
+    """Serializer for pro gap positive pattern data."""
+
+    stock = StockSerializer(read_only=True)
+    stock_price_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProGapPositivePattern
+        fields = [
+            "id",
+            "stock",
+            "date",
+            "stock_price",
+            "stock_price_details",
+        ]
+
+    def get_stock_price_details(self, obj):
+        price = StockPrice.objects.filter(stock=obj.stock, date=obj.date).first()
+        if not price:
+            return None
+        return StockPriceSerializer(price).data
+
+
+class ProGapNegativePatternSerializer(serializers.ModelSerializer):
+    """Serializer for pro gap negative pattern data."""
+
+    stock = StockSerializer(read_only=True)
+    stock_price_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProGapNegativePattern
         fields = [
             "id",
             "stock",

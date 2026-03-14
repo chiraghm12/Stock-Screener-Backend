@@ -2,9 +2,14 @@ from django.urls import path
 
 from .views import (
     BearishEngulfingPatternListView,
+    BearishKickerPatternListView,
     BullishEngulfingPatternListView,
+    BullishKickerPatternListView,
+    DojiPatternListView,
     HammerPatternListView,
     InvertedHammerPatternListView,
+    ProGapNegativePatternListView,
+    ProGapPositivePatternListView,
     StockPriceCreateView,
 )
 
@@ -33,5 +38,30 @@ urlpatterns = [
         "patterns/bearish-engulfing/",
         BearishEngulfingPatternListView.as_view(),
         name="bearish-engulfing-pattern-list",
+    ),
+    path(
+        "patterns/doji/",
+        DojiPatternListView.as_view(),
+        name="doji-pattern-list",
+    ),
+    path(
+        "patterns/bullish-kicker/",
+        BullishKickerPatternListView.as_view(),
+        name="bullish-kicker-pattern-list",
+    ),
+    path(
+        "patterns/bearish-kicker/",
+        BearishKickerPatternListView.as_view(),
+        name="bearish-kicker-pattern-list",
+    ),
+    path(
+        "patterns/pro-gap-positive/",
+        ProGapPositivePatternListView.as_view(),
+        name="pro-gap-positive-pattern-list",
+    ),
+    path(
+        "patterns/pro-gap-negative/",
+        ProGapNegativePatternListView.as_view(),
+        name="pro-gap-negative-pattern-list",
     ),
 ]

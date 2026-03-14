@@ -8,9 +8,14 @@ from django.db import transaction
 
 from .models import (
     BearishEngulfingPattern,
+    BearishKickerPattern,
     BullishEngulfingPattern,
+    BullishKickerPattern,
+    DojiPattern,
     HammerPattern,
     InvertedHammerPattern,
+    ProGapNegativePattern,
+    ProGapPositivePattern,
     Stock,
     StockPrice,
 )
@@ -177,6 +182,11 @@ def add_pattern_data() -> Dict[str, Any]:
                 "inverted_hammer_count": 0,
                 "bullish_engulfing_count": 0,
                 "bearish_engulfing_count": 0,
+                "doji_count": 0,
+                "bullish_kicker_count": 0,
+                "bearish_kicker_count": 0,
+                "pro_gap_positive_count": 0,
+                "pro_gap_negative_count": 0,
             }
 
         latest_date = date_list[0]
@@ -198,12 +208,22 @@ def add_pattern_data() -> Dict[str, Any]:
         inverted_hammer_objects = []
         bullish_engulfing_objects = []
         bearish_engulfing_objects = []
+        doji_objects = []
+        bullish_kicker_objects = []
+        bearish_kicker_objects = []
+        pro_gap_positive_objects = []
+        pro_gap_negative_objects = []
 
         # Clean existing patterns for that date to avoid duplicates
         HammerPattern.objects.all().delete()
         InvertedHammerPattern.objects.all().delete()
         BullishEngulfingPattern.objects.all().delete()
         BearishEngulfingPattern.objects.all().delete()
+        DojiPattern.objects.all().delete()
+        BullishKickerPattern.objects.all().delete()
+        BearishKickerPattern.objects.all().delete()
+        ProGapPositivePattern.objects.all().delete()
+        ProGapNegativePattern.objects.all().delete()
 
         for price in prices:
             open_price = Decimal(price.opening_price)
@@ -214,6 +234,18 @@ def add_pattern_data() -> Dict[str, Any]:
             body = abs(close_price - open_price)
             upper = high_price - max(open_price, close_price)
             lower = min(open_price, close_price) - low_price
+
+            # Doji: open and close are very close
+            if high_price > low_price and body <= (high_price - low_price) * Decimal(
+                "0.1"
+            ):
+                doji_objects.append(
+                    DojiPattern(
+                        stock=price.stock,
+                        date=latest_date,
+                        stock_price=price.closing_price,
+                    )
+                )
 
             # Avoid division / comparison issues when body is extremely small
             if body <= Decimal("0.01"):
@@ -276,10 +308,55 @@ def add_pattern_data() -> Dict[str, Any]:
                         )
                     )
 
+                # Bullish Kicker: prev bearish, curr bullish, gaps up (open >= prev_open)
+                if is_prev_bearish and is_curr_bullish and open_price >= prev_open:
+                    bullish_kicker_objects.append(
+                        BullishKickerPattern(
+                            stock=price.stock,
+                            date=latest_date,
+                            stock_price=price.closing_price,
+                        )
+                    )
+
+                # Bearish Kicker: prev bullish, curr bearish, gaps down (open <= prev_open)
+                if is_prev_bullish and is_curr_bearish and open_price <= prev_open:
+                    bearish_kicker_objects.append(
+                        BearishKickerPattern(
+                            stock=price.stock,
+                            date=latest_date,
+                            stock_price=price.closing_price,
+                        )
+                    )
+
+                # Pro Gap Positive: prev bearish, curr bullish, open > prev_close
+                if is_prev_bearish and is_curr_bullish and open_price > prev_close:
+                    pro_gap_positive_objects.append(
+                        ProGapPositivePattern(
+                            stock=price.stock,
+                            date=latest_date,
+                            stock_price=price.closing_price,
+                        )
+                    )
+
+                # Pro Gap Negative: prev bullish, curr bearish, open < prev_close
+                if is_prev_bullish and is_curr_bearish and open_price < prev_close:
+                    pro_gap_negative_objects.append(
+                        ProGapNegativePattern(
+                            stock=price.stock,
+                            date=latest_date,
+                            stock_price=price.closing_price,
+                        )
+                    )
+
         hammer_count = 0
         inverted_hammer_count = 0
         bullish_engulfing_count = 0
         bearish_engulfing_count = 0
+        doji_count = 0
+        bullish_kicker_count = 0
+        bearish_kicker_count = 0
+        pro_gap_positive_count = 0
+        pro_gap_negative_count = 0
 
         if hammer_objects:
             HammerPattern.objects.bulk_create(hammer_objects, batch_size=500)
@@ -306,13 +383,56 @@ def add_pattern_data() -> Dict[str, Any]:
             )
             bearish_engulfing_count = len(bearish_engulfing_objects)
 
+        if doji_objects:
+            DojiPattern.objects.bulk_create(
+                doji_objects,
+                batch_size=500,
+            )
+            doji_count = len(doji_objects)
+
+        if bullish_kicker_objects:
+            BullishKickerPattern.objects.bulk_create(
+                bullish_kicker_objects,
+                batch_size=500,
+            )
+            bullish_kicker_count = len(bullish_kicker_objects)
+
+        if bearish_kicker_objects:
+            BearishKickerPattern.objects.bulk_create(
+                bearish_kicker_objects,
+                batch_size=500,
+            )
+            bearish_kicker_count = len(bearish_kicker_objects)
+
+        if pro_gap_positive_objects:
+            ProGapPositivePattern.objects.bulk_create(
+                pro_gap_positive_objects,
+                batch_size=500,
+            )
+            pro_gap_positive_count = len(pro_gap_positive_objects)
+
+        if pro_gap_negative_objects:
+            ProGapNegativePattern.objects.bulk_create(
+                pro_gap_negative_objects,
+                batch_size=500,
+            )
+            pro_gap_negative_count = len(pro_gap_negative_objects)
+
         logger.info(
-            "Pattern detection for %s completed: %s hammer, %s inverted hammer, %s bullish engulfing, %s bearish engulfing",
+            "Pattern detection for %s completed: %s hammer, "
+            "%s inverted hammer, %s bullish engulfing, %s bearish engulfing, "
+            "%s doji, %s bullish kicker, %s bearish kicker, "
+            "%s pro gap positive, %s pro gap negative",
             latest_date,
             hammer_count,
             inverted_hammer_count,
             bullish_engulfing_count,
             bearish_engulfing_count,
+            doji_count,
+            bullish_kicker_count,
+            bearish_kicker_count,
+            pro_gap_positive_count,
+            pro_gap_negative_count,
         )
 
         return {
@@ -321,6 +441,11 @@ def add_pattern_data() -> Dict[str, Any]:
             "inverted_hammer_count": inverted_hammer_count,
             "bullish_engulfing_count": bullish_engulfing_count,
             "bearish_engulfing_count": bearish_engulfing_count,
+            "doji_count": doji_count,
+            "bullish_kicker_count": bullish_kicker_count,
+            "bearish_kicker_count": bearish_kicker_count,
+            "pro_gap_positive_count": pro_gap_positive_count,
+            "pro_gap_negative_count": pro_gap_negative_count,
         }
     except Exception as e:
         logger.exception(
@@ -333,4 +458,9 @@ def add_pattern_data() -> Dict[str, Any]:
             "inverted_hammer_count": 0,
             "bullish_engulfing_count": 0,
             "bearish_engulfing_count": 0,
+            "doji_count": 0,
+            "bullish_kicker_count": 0,
+            "bearish_kicker_count": 0,
+            "pro_gap_positive_count": 0,
+            "pro_gap_negative_count": 0,
         }

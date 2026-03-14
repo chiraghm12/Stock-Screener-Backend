@@ -6,21 +6,36 @@ from rest_framework.views import APIView
 
 from .filters import (
     BearishEngulfingPatternFilter,
+    BearishKickerPatternFilter,
     BullishEngulfingPatternFilter,
+    BullishKickerPatternFilter,
+    DojiPatternFilter,
     HammerPatternFilter,
     InvertedHammerPatternFilter,
+    ProGapNegativePatternFilter,
+    ProGapPositivePatternFilter,
 )
 from .models import (
     BearishEngulfingPattern,
+    BearishKickerPattern,
     BullishEngulfingPattern,
+    BullishKickerPattern,
+    DojiPattern,
     HammerPattern,
     InvertedHammerPattern,
+    ProGapNegativePattern,
+    ProGapPositivePattern,
 )
 from .serializers import (
     BearishEngulfingPatternSerializer,
+    BearishKickerPatternSerializer,
     BullishEngulfingPatternSerializer,
+    BullishKickerPatternSerializer,
+    DojiPatternSerializer,
     HammerPatternSerializer,
     InvertedHammerPatternSerializer,
+    ProGapNegativePatternSerializer,
+    ProGapPositivePatternSerializer,
 )
 from .utils import add_pattern_data, fetch_and_store_nse_stock_price_data
 
@@ -90,3 +105,43 @@ class BearishEngulfingPatternListView(generics.ListAPIView):
     queryset = BearishEngulfingPattern.objects.all().select_related("stock")
     serializer_class = BearishEngulfingPatternSerializer
     filterset_class = BearishEngulfingPatternFilter
+
+
+class DojiPatternListView(generics.ListAPIView):
+    """List API view for doji patterns with optional index/date filtering."""
+
+    queryset = DojiPattern.objects.all().select_related("stock")
+    serializer_class = DojiPatternSerializer
+    filterset_class = DojiPatternFilter
+
+
+class BullishKickerPatternListView(generics.ListAPIView):
+    """List API view for bullish kicker patterns with optional index/date filtering."""
+
+    queryset = BullishKickerPattern.objects.all().select_related("stock")
+    serializer_class = BullishKickerPatternSerializer
+    filterset_class = BullishKickerPatternFilter
+
+
+class BearishKickerPatternListView(generics.ListAPIView):
+    """List API view for bearish kicker patterns with optional index/date filtering."""
+
+    queryset = BearishKickerPattern.objects.all().select_related("stock")
+    serializer_class = BearishKickerPatternSerializer
+    filterset_class = BearishKickerPatternFilter
+
+
+class ProGapPositivePatternListView(generics.ListAPIView):
+    """List API view for pro gap positive patterns with optional index/date filtering."""
+
+    queryset = ProGapPositivePattern.objects.all().select_related("stock")
+    serializer_class = ProGapPositivePatternSerializer
+    filterset_class = ProGapPositivePatternFilter
+
+
+class ProGapNegativePatternListView(generics.ListAPIView):
+    """List API view for pro gap negative patterns with optional index/date filtering."""
+
+    queryset = ProGapNegativePattern.objects.all().select_related("stock")
+    serializer_class = ProGapNegativePatternSerializer
+    filterset_class = ProGapNegativePatternFilter

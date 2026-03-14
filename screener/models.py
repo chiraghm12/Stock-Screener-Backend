@@ -145,3 +145,83 @@ class BearishEngulfingPattern(BaseModel):
             models.Index(fields=["date"]),
             models.Index(fields=["stock", "date"]),
         ]
+
+
+class DojiPattern(BaseModel):
+    """Model representing a doji pattern."""
+
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="doji_patterns"
+    )
+    date = models.DateField()
+    stock_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["stock", "date"]),
+        ]
+
+
+class BullishKickerPattern(BaseModel):
+    """Model representing a bullish kicker pattern."""
+
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="bullish_kicker_patterns"
+    )
+    date = models.DateField()
+    stock_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["stock", "date"]),
+        ]
+
+
+class BearishKickerPattern(BaseModel):
+    """Model representing a bearish kicker pattern."""
+
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="bearish_kicker_patterns"
+    )
+    date = models.DateField()
+    stock_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["stock", "date"]),
+        ]
+
+
+class ProGapPositivePattern(BaseModel):
+    """Model representing a pro gap positive pattern."""
+
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="pro_gap_positive_patterns"
+    )
+    date = models.DateField()
+    stock_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["stock", "date"]),
+        ]
+
+
+class ProGapNegativePattern(BaseModel):
+    """Model representing a pro gap negative pattern."""
+
+    stock = models.ForeignKey(
+        Stock, on_delete=models.CASCADE, related_name="pro_gap_negative_patterns"
+    )
+    date = models.DateField()
+    stock_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["stock", "date"]),
+        ]
